@@ -12,3 +12,7 @@ func WriteToConsole(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func LoadSession(next http.Handler) http.Handler {
+	return app.Session.LoadAndSave(next)
+}
