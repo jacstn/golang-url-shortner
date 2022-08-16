@@ -18,14 +18,14 @@ func NewHandlers(c *config.AppConfig) {
 
 func Home(w http.ResponseWriter, r *http.Request) {
 
-	strMap := make(map[string]string)
+	strMap := make(map[string]interface{})
 	strMap["variable"] = "variable to display"
-	tmplData := models.TemplateData{
-		Data: strMap,
-	}
+
 	app.Session.Put(r.Context(), "remote_ip", r.RemoteAddr)
 
-	renderTemplate(w, "home", &tmplData)
+	renderTemplate(w, "home", &models.TemplateData{
+		Data: strMap,
+	})
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
@@ -38,23 +38,38 @@ func About(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewUrl(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "new-url", nil)
+	strMap := make(map[string]interface{})
+	strMap["new_data"] = "new data passed before POST"
+	renderTemplate(w, "new-url", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: strMap,
+	})
 }
 
 func CreateUrl(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	// model := models.Url{
-	// 	Url: r.Form.Get("surl"),
-	// }
 	form := forms.New(r.PostForm)
 
-	if form.Has("surl", r) == false {
+	url := models.Url{}
+	url.Url = r.Form.Get("surl")
+	data := make(map[string]interface{})
+	data["url_info"] = url
+	data["new_data"] = "new data after POST"
+	form.Has("surl", r)
+	if !form.Valid() {
 
+		renderTemplate(w, "new-url", &models.TemplateData{
+			Data: data,
+			Form: form,
+		})
+		return
 	}
-
-	fmt.Println("create url", ":")
-	renderTemplate(w, "new-url", nil)
+	fmt.Println("create url", ":", url.Url)
+	renderTemplate(w, "new-url", &models.TemplateData{
+		Data: data,
+		Form: form,
+	})
 }
 
 func renderTemplate(w http.ResponseWriter, templateName string, data *models.TemplateData) {
@@ -62,6 +77,6 @@ func renderTemplate(w http.ResponseWriter, templateName string, data *models.Tem
 
 	err := parsedTemplate.Execute(w, data)
 	if err != nil {
-		fmt.Fprintf(w, "This is about page")
+		fmt.Fprintf(w, "Error handling template page!!", err)
 	}
 }
