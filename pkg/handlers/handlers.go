@@ -21,7 +21,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	strMap := make(map[string]interface{})
 	strMap["variable"] = "variable to display"
 
-	app.Session.Put(r.Context(), "remote_ip", r.RemoteAddr)
+	app.Session.Put(r.Context(), "remote_ip", r.Host)
 
 	renderTemplate(w, "home", &models.TemplateData{
 		Data: strMap,
@@ -38,11 +38,13 @@ func About(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewUrl(w http.ResponseWriter, r *http.Request) {
-	strMap := make(map[string]interface{})
-	strMap["new_data"] = "new data passed before POST"
+	urlModel := models.Url{}
+
+	data := make(map[string]interface{})
+	data["url_model"] = urlModel
 	renderTemplate(w, "new-url", &models.TemplateData{
 		Form: forms.New(nil),
-		Data: strMap,
+		Data: data,
 	})
 }
 
@@ -51,21 +53,12 @@ func CreateUrl(w http.ResponseWriter, r *http.Request) {
 
 	form := forms.New(r.PostForm)
 
-	url := models.Url{}
-	url.Url = r.Form.Get("surl")
 	data := make(map[string]interface{})
-	data["url_info"] = url
-	data["new_data"] = "new data after POST"
-	form.Has("surl", r)
-	if !form.Valid() {
+	data["url_model"] = models.Url{Url: r.Form.Get("surl")}
 
-		renderTemplate(w, "new-url", &models.TemplateData{
-			Data: data,
-			Form: form,
-		})
-		return
-	}
-	fmt.Println("create url", ":", url.Url)
+	form.Has("surl", r)
+	form.ValidUrl("surl", r)
+
 	renderTemplate(w, "new-url", &models.TemplateData{
 		Data: data,
 		Form: form,

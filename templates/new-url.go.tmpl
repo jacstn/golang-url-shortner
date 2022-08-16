@@ -5,12 +5,13 @@
   <form method="post" action="/new-url">
     <div class="row mt-3">
       <div class="form-group">
-        {{if .Data}}{{index .Data "new_data"}}{{end}}
+        
+        {{$urlModel := index .Data "url_model"}}
         <label for="surl">URL</label> 
         {{with .Form.Errors.Get "surl"}}
           <label class="text-danger"> {{.}}</label>
         {{end}}
-        <input type="text" class="form-control {{with .Form.Errors.Get "surl"}}is-invalid{{end}}" id="surl" name="surl" aria-describedby="surl" placeholder="Enter URL">
+        <input type="text" value="{{$urlModel.Url }}" class="form-control {{with .Form.Errors.Get "surl"}}is-invalid{{end}}" id="surl" name="surl" aria-describedby="surl" placeholder="Enter URL">
       </div>
     </div>
     <div class="row mt-3">
