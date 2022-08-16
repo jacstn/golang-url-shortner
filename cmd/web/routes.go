@@ -12,10 +12,12 @@ func routes() *chi.Mux {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
-	mux.Use(WriteToConsole)
+	//mux.Use(WriteToConsole)
 	mux.Use(LoadSession)
 	mux.Get("/", handlers.Home)
 	mux.Get("/about", handlers.About)
+	mux.Get("/new-url", handlers.NewUrl)
+	mux.Post("/new-url", handlers.CreateUrl)
 
 	fileServer := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

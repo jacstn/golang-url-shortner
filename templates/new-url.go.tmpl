@@ -1,0 +1,12 @@
+{{template "base" .}}
+
+{{define "content"}}
+<form method="post" action="/new-url">
+    <div class="form-group">
+      <label for="surl">URL</label>
+      <input type="text" class="form-control" id="surl" name="surl" aria-describedby="surl" placeholder="Enter URL">
+    </div>
+    <input type="submit" value="Submit" class="btn btn-primary"/>
+  </form>
+
+  {{end}}

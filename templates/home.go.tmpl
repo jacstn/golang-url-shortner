@@ -1,0 +1,11 @@
+{{template "base" .}}
+
+{{define "content"}}
+<div class="row">
+    <div class="col">
+        <img src="/static/images/urllogo.png"/>
+        {{index .Data "variable"}}
+        <button class="btn btn-primary">Primary button</button>
+    </div>
+</div>
+{{end}}    
