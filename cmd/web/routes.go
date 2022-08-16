@@ -14,6 +14,7 @@ func routes() *chi.Mux {
 	mux.Use(middleware.Recoverer)
 	//mux.Use(WriteToConsole)
 	mux.Use(LoadSession)
+	mux.Use(NoSurf)
 	mux.Get("/", handlers.Home)
 	mux.Get("/about", handlers.About)
 	mux.Get("/new-url", handlers.NewUrl)

@@ -8,6 +8,7 @@ import (
 	"github.com/jacstn/golang-url-shortner/config"
 	"github.com/jacstn/golang-url-shortner/pkg/forms"
 	"github.com/jacstn/golang-url-shortner/pkg/models"
+	"github.com/justinas/nosurf"
 )
 
 var app *config.AppConfig
@@ -39,9 +40,9 @@ func About(w http.ResponseWriter, r *http.Request) {
 
 func NewUrl(w http.ResponseWriter, r *http.Request) {
 	urlModel := models.Url{}
-
 	data := make(map[string]interface{})
 	data["url_model"] = urlModel
+	data["csrf_token"] = nosurf.Token(r)
 	renderTemplate(w, "new-url", &models.TemplateData{
 		Form: forms.New(nil),
 		Data: data,
@@ -52,16 +53,16 @@ func CreateUrl(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	form := forms.New(r.PostForm)
-
-	data := make(map[string]interface{})
-	data["url_model"] = models.Url{Url: r.Form.Get("surl")}
-
 	form.Has("surl", r)
 	form.ValidUrl("surl", r)
 
+	data := make(map[string]interface{})
+	data["csrf_token"] = nosurf.Token(r)
+	data["url_model"] = models.Url{Url: r.Form.Get("surl")}
+
 	renderTemplate(w, "new-url", &models.TemplateData{
-		Data: data,
 		Form: form,
+		Data: data,
 	})
 }
 
