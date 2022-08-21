@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/jacstn/golang-url-shortner/pkg/handlers"
+	"github.com/jacstn/golang-url-shortner/internal/handlers"
 )
 
 func routes() *chi.Mux {
