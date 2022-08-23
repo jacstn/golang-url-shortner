@@ -35,3 +35,7 @@ func (f *Form) Has(field string, r *http.Request) bool {
 
 	return true
 }
+
+func (f *Form) Valid() bool {
+	return len(f.Errors) == 0
+}

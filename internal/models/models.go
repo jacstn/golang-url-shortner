@@ -13,17 +13,26 @@ type Url struct {
 }
 
 func SaveUrl(db *sql.DB, url Url) int64 {
-	res, err := db.Exec("Insert into domain (name, createdAt) values (?, ?)", url.Name, time.Now())
-	if err != nil {
+	var id int64
+	err := db.QueryRow("SELECT id FROM domain where name=?", url.Name).Scan(&id)
 
+	if err == nil && id > 0 {
+		return id
+	}
+
+	res, err := db.Exec("Insert into domain (name, createdAt) values (?, ?)", url.Name, time.Now())
+
+	if err != nil {
 		fmt.Println("error while inserting into database", err)
 		return 0
 	}
-	id, err := res.LastInsertId()
+
+	id, err = res.LastInsertId()
 	if err != nil {
 		println("Error:", err.Error())
 		return 0
 	}
+
 	fmt.Println("record saved, id", id)
 	return id
 }

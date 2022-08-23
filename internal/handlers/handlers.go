@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/jacstn/golang-url-shortner/config"
 	"github.com/jacstn/golang-url-shortner/internal/forms"
 	"github.com/jacstn/golang-url-shortner/internal/helpers"
@@ -50,24 +51,25 @@ func NewUrl(w http.ResponseWriter, r *http.Request) {
 
 func CreateUrl(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	app.Session.Pop(r.Context(), "saved_id")
 	form := forms.New(r.PostForm)
 	form.Has("surl", r)
 	form.ValidUrl("surl", r)
+
 	urlModel := models.Url{Name: r.Form.Get("surl")}
+
+	if form.Valid() {
+		id := models.SaveUrl(app.DB, urlModel)
+		if id > 0 {
+			app.Session.Put(r.Context(), "saved_id", id)
+
+			ViewUrl(w, r)
+			return
+		}
+	}
 
 	data := make(map[string]interface{})
 	data["csrf_token"] = nosurf.Token(r)
 	data["url_model"] = urlModel
-
-	id := models.SaveUrl(app.DB, urlModel)
-	if id > 0 {
-		fmt.Println(id)
-		app.Session.Put(r.Context(), "saved_id", id)
-		ViewUrl(w, r)
-		return
-	}
-	fmt.Println("saving url error", id)
 
 	renderTemplate(w, "new-url", &models.TemplateData{
 		Form: form,
@@ -77,9 +79,9 @@ func CreateUrl(w http.ResponseWriter, r *http.Request) {
 
 func ViewUrl(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
-	id := app.Session.GetString(r.Context(), "saved_id")
-	fmt.Println("got id from session", id)
-	url := models.GetUrlById(app.DB, id)
+	id := app.Session.Pop(r.Context(), "saved_id")
+
+	url := models.GetUrlById(app.DB, fmt.Sprintf("%d", id))
 
 	if url.Id == 0 {
 		data["link"] = "URL not found"
@@ -90,6 +92,13 @@ func ViewUrl(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "view-url", &models.TemplateData{
 		Data: data,
 	})
+}
+
+func Redirect(w http.ResponseWriter, r *http.Request) {
+	id := helpers.CodeToInt(chi.URLParam(r, "id"), app.CharArr)
+	url := models.GetUrlById(app.DB, fmt.Sprintf("%d", id))
+
+	http.Redirect(w, r, url.Name, http.StatusSeeOther)
 }
 
 func renderTemplate(w http.ResponseWriter, templateName string, data *models.TemplateData) {
