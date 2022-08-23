@@ -1,13 +1,12 @@
 {{template "base" .}}
 
 {{define "content"}}
-  <h3>Create Short URL</h3>
+  <h3><img width="70px" src="/static/images/urllogo.png">Create Short URL</h3>
   <form method="post" action="/new-url">
     <div class="row mt-3">
       <div class="form-group">
         
         {{$urlModel := index .Data "url_model"}}
-        <label for="surl">URL</label> 
         {{with .Form.Errors.Get "surl"}}
           <label class="text-danger"> {{.}}</label>
         {{end}}

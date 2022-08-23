@@ -19,7 +19,7 @@ func NewHandlers(c *config.AppConfig) {
 	app = c
 }
 
-func Home(w http.ResponseWriter, r *http.Request) {
+func List(w http.ResponseWriter, r *http.Request) {
 
 	displayData := make(map[string]interface{})
 
@@ -38,7 +38,7 @@ func About(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "about", &data)
 }
 
-func NewUrl(w http.ResponseWriter, r *http.Request) {
+func Home(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["url_model"] = models.Url{}
 	data["csrf_token"] = nosurf.Token(r)
