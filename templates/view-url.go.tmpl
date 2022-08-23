@@ -1,0 +1,10 @@
+{{template "base" .}}
+{{define "content"}}
+<div class="card">
+    <div class="card-body">
+      Your Link is here:
+
+      <h5 class="card-title">{{ index .Data "link" }}</h5>
+    </div>
+  </div>
+{{end}}

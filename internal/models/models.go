@@ -12,15 +12,20 @@ type Url struct {
 	CreatedAt string
 }
 
-func SaveUrl(db *sql.DB, url Url) bool {
-	_, err := db.Exec("Insert into domain (name, createdAt) values (?, ?)", url.Name, time.Now())
+func SaveUrl(db *sql.DB, url Url) int64 {
+	res, err := db.Exec("Insert into domain (name, createdAt) values (?, ?)", url.Name, time.Now())
 	if err != nil {
+
 		fmt.Println("error while inserting into database", err)
-
-		return false
+		return 0
 	}
-
-	return true
+	id, err := res.LastInsertId()
+	if err != nil {
+		println("Error:", err.Error())
+		return 0
+	}
+	fmt.Println("record saved, id", id)
+	return id
 }
 
 func ListUrls(db *sql.DB) []Url {
@@ -29,7 +34,7 @@ func ListUrls(db *sql.DB) []Url {
 	res, err := db.Query("SELECT * FROM domain")
 
 	if err != nil {
-		fmt.Println("cannot select from database", err)
+		fmt.Println("cannot query from database", err)
 		return []Url{}
 	}
 
@@ -45,4 +50,16 @@ func ListUrls(db *sql.DB) []Url {
 	}
 
 	return urls
+}
+
+func GetUrlById(db *sql.DB, id string) Url {
+	url := Url{}
+	err := db.QueryRow("SELECT * FROM domain where id=?", id).Scan(&url.Id, &url.Name, &url.CreatedAt)
+
+	if err != nil {
+
+		return url
+	}
+
+	return url
 }

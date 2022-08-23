@@ -7,6 +7,7 @@ import (
 
 	"github.com/jacstn/golang-url-shortner/config"
 	"github.com/jacstn/golang-url-shortner/internal/forms"
+	"github.com/jacstn/golang-url-shortner/internal/helpers"
 	"github.com/jacstn/golang-url-shortner/internal/models"
 	"github.com/justinas/nosurf"
 )
@@ -20,14 +21,9 @@ func NewHandlers(c *config.AppConfig) {
 func Home(w http.ResponseWriter, r *http.Request) {
 
 	displayData := make(map[string]interface{})
-	displayData["variable"] = "variable to display"
 
 	app.Session.Put(r.Context(), "remote_ip", r.Host)
-
-	var urls []models.Url
-	urls = models.ListUrls(app.DB)
-
-	displayData["list_of_urls"] = urls
+	displayData["list_of_urls"] = models.ListUrls(app.DB)
 
 	renderTemplate(w, "home", &models.TemplateData{
 		Data: displayData,
@@ -35,10 +31,8 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	ip := app.Session.GetString(r.Context(), "remote_ip")
+	//ip := app.Session.GetString(r.Context(), "remote_ip")
 	data := models.TemplateData{}
-	fmt.Printf(ip)
-	//models.TemplateData{ data["remote_ip"] = string(ip)
 
 	renderTemplate(w, "about", &data)
 }
@@ -56,7 +50,7 @@ func NewUrl(w http.ResponseWriter, r *http.Request) {
 
 func CreateUrl(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-
+	app.Session.Pop(r.Context(), "saved_id")
 	form := forms.New(r.PostForm)
 	form.Has("surl", r)
 	form.ValidUrl("surl", r)
@@ -65,10 +59,35 @@ func CreateUrl(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["csrf_token"] = nosurf.Token(r)
 	data["url_model"] = urlModel
-	models.SaveUrl(app.DB, urlModel)
+
+	id := models.SaveUrl(app.DB, urlModel)
+	if id > 0 {
+		fmt.Println(id)
+		app.Session.Put(r.Context(), "saved_id", id)
+		ViewUrl(w, r)
+		return
+	}
+	fmt.Println("saving url error", id)
 
 	renderTemplate(w, "new-url", &models.TemplateData{
 		Form: form,
+		Data: data,
+	})
+}
+
+func ViewUrl(w http.ResponseWriter, r *http.Request) {
+	data := make(map[string]interface{})
+	id := app.Session.GetString(r.Context(), "saved_id")
+	fmt.Println("got id from session", id)
+	url := models.GetUrlById(app.DB, id)
+
+	if url.Id == 0 {
+		data["link"] = "URL not found"
+	} else {
+		data["link"] = r.Host + "/" + helpers.IntToCode(int(url.Id), app.CharArr)
+	}
+
+	renderTemplate(w, "view-url", &models.TemplateData{
 		Data: data,
 	})
 }
