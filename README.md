@@ -12,3 +12,4 @@
 - using roter and middleware
 - using forms and server validators
 - using CSRF forms security mechanism
+- using static resources
