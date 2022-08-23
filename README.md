@@ -10,3 +10,4 @@
 - using sessions
 - using templates
 - using roter and middleware
+- using forms and server validators
