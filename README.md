@@ -23,5 +23,5 @@ Go development environment https://go.dev/
   - Run `go get -d ./...` to download all dependencies
   - Start application by executing `go run cmd/web/main.go cmd/web/middleware.go cmd/web/routes.go`
 
-### TODO
+#### TODO
  - Cover application with more tests
