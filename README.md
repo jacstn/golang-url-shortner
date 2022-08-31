@@ -6,19 +6,22 @@
 
 ### This is simple application to demonstrate several concepts in GoLang including:
 
-- using mysql database
-- using sessions
-- using templates and passing data to templates
-- using roter and middleware
-- using forms and server validators
-- using CSRF forms security mechanism
-- using static resources
+- Using mysql database
+- Using sessions
+- Using templates and passing data to templates
+- Using roter and middleware
+- Using forms and server validators
+- Using CSRF forms security mechanism
+- Using static resources
 
 ### Requirements
 Mysql database (https://www.mysql.com/downloads)
 Go development environment https://go.dev/
 
-## Installation
+### Installation
   - Clone repository
   - Run `go get -d ./...` to download all dependencies
   - Start application by executing `go run cmd/web/main.go cmd/web/middleware.go cmd/web/routes.go`
+
+### TODO
+ - Cover application with more tests
