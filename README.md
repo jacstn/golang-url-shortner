@@ -13,3 +13,12 @@
 - using forms and server validators
 - using CSRF forms security mechanism
 - using static resources
+
+### Requirements
+Mysql database (https://www.mysql.com/downloads)
+Go development environment https://go.dev/
+
+## Installation
+  - Clone repository
+  - Run `go get -d ./...` to download all dependencies
+  - Start application by executing `go run cmd/web/main.go cmd/web/middleware.go cmd/web/routes.go`
